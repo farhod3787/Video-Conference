@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 
 import './App.css';
 
-const SOCKET_URL = 'http://127.0.0.1:8000';
+const SOCKET_URL = 'https://video-conference-x2fq.onrender.com/' // 'http://127.0.0.1:8000';
 
 let myStream, peer;
 let peers = [];
@@ -34,8 +34,8 @@ const Video = () => {
   useEffect(() => {
     peer = new Peer(undefined, {
       path: '/peerjs',
-      host: '/',
-      port: 8000,
+      host: '/'
+      //,port: 8000,
     });
 
     peer.on('open', (id) => {
