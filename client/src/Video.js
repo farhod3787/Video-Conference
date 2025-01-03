@@ -164,6 +164,7 @@ const Video = () => {
   };
 
   const handleLeaveMeet = () => {
+    socket.emit('disconnect','');
     window.location.href = '/';
   };
 
