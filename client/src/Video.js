@@ -5,7 +5,8 @@ import { useParams } from 'react-router-dom';
 
 import './App.css';
 
-const SOCKET_URL = 'https://video-conference-x2fq.onrender.com/' // 'http://127.0.0.1:8000';
+// const SOCKET_URL = 'http://127.0.0.1:8000';
+const SOCKET_URL = 'https://video-conference-x2fq.onrender.com/'
 
 let myStream, peer;
 let peers = [];
@@ -35,7 +36,7 @@ const Video = () => {
     peer = new Peer(undefined, {
       path: '/peerjs',
       host: '/'
-      //,port: 8000,
+      // ,port: 8000,
     });
 
     peer.on('open', (id) => {
@@ -62,23 +63,10 @@ const Video = () => {
       } else {
         console.error("getUserMedia API qo‘llab-quvvatlanmaydi.");
       }
-      // getMedia
-      // .getUserMedia({
-      //   video: true,
-      //   //audio: true,
-      // })
-      // .then((stream) => {
-      //   myStream = stream;
-      //   const myVideo = document.createElement('video');
-      //   handleAddVideoStream(myVideo, myStream);
-      //   handleAnswerCall(stream);
-      // })
-      // .catch((error) => {
-      //   console.error(error);
-      // });
+
 
     socket.on('user-disconnected', (userId) => {
-      if (peers[userId]) peers[userId].destroy();
+      if (peers[userId]) peers[userId].close();
       socket.disconnect();
     });
 
@@ -94,6 +82,7 @@ const Video = () => {
 
     const handleNewUserJoin = () => {
       socket.on('user-connected', (userId) => {
+
         navigator.mediaDevices
           .getUserMedia({
             video: true,

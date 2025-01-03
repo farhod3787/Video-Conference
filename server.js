@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
     });
 
     // When User Disconnected
-    socket.on('disconnect', (userId) => {
+    socket.on('disconnect', (msg) => {
       socket.broadcast.to(roomId).emit('user-disconnected', userId);
     });
   });
