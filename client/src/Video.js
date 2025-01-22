@@ -5,18 +5,23 @@ import { useParams } from 'react-router-dom';
 
 import './App.css';
 
-// const SOCKET_URL = 'http://127.0.0.1:8000';
-const SOCKET_URL = 'https://video-conference-x2fq.onrender.com/'
+const SOCKET_URL = 'http://127.0.0.1:8000';
+// const SOCKET_URL = 'https://video-conference-x2fq.onrender.com/'
 
 let myStream, peer;
 let peers = [];
 let socket = io(SOCKET_URL);
+
+socket.on('connect', () => {
+  console.log('Сокет подключен:', socket.id);
+});
 
 const Video = () => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [muted, setMuted] = useState(false);
   const [hideVideo, setHideVideo] = useState(false);
+  const [myStreamState, setMyStream] = useState(null);
 
   const { roomId } = useParams();
 
@@ -36,7 +41,7 @@ const Video = () => {
     peer = new Peer(undefined, {
       path: '/peerjs',
       host: '/'
-      // ,port: 8000,
+      ,port: 8000,
     });
 
     peer.on('open', (id) => {
@@ -50,12 +55,13 @@ const Video = () => {
       navigator.mozGetUserMedia;
 
       if (getMedia) {
-        getMedia.call(navigator, { video: true })
+        getMedia.call(navigator, { video: true, audio: true })
           .then((stream) => {
-              myStream = stream;
-              const myVideo = document.createElement('video');
-              handleAddVideoStream(myVideo, myStream);
-              handleAnswerCall(stream);
+            myStream = stream;
+            setMyStream(stream)
+            const myVideo = document.createElement('video');
+            handleAddVideoStream(myVideo, myStream);
+            handleAnswerCall(stream);
           })
           .catch((error) => {
             console.error("Xato yuz berdi:", error);
@@ -82,22 +88,31 @@ const Video = () => {
 
     const handleNewUserJoin = () => {
       socket.on('user-connected', (userId) => {
-
         navigator.mediaDevices
           .getUserMedia({
             video: true,
-            //audio: true, // For Testing Purpose
+            audio: true
           })
           .then((stream) => {
+
+            setMyStream(stream)
             const call = peer.call(userId, stream);
-            const video = document.createElement('video');
+            if (!call) {
+              console.error('Failed to initiate call');
+            } else {
+              console.log('Call initiated:', call);
+            }
+
+            const userVideo = document.createElement('video');
 
             call.on('stream', (userVideoStream) => {
-              handleAddVideoStream(video, userVideoStream);
+              console.log('Call On Stream ', userVideoStream);
+
+              handleAddVideoStream(userVideo, userVideoStream);
             });
 
             call.on('close', () => {
-              video.remove();
+              userVideo.remove();
             });
 
             peers[userId] = call;
@@ -121,33 +136,34 @@ const Video = () => {
 
     video.addEventListener('loadedmetadata', () => {
       video.play();
-      video.muted = true; // muted for testing purposes
+      video.muted = true;
     });
     videoGrid.append(video);
   };
 
   // Handlining Mute And Unmute
   const handleMuteUnmute = () => {
-    const enabled = myStream.getAudioTracks()[0].enabled;
-    if (enabled) {
-      myStream.getAudioTracks()[0].enabled = false;
-      setMuted(true);
-    } else {
-      myStream.getAudioTracks()[0].enabled = true;
-      setMuted(false);
+    console.log('Handle Mute 1');
+
+    if (!myStreamState) return; // Проверка, если поток доступен
+    console.log('Handle Mute 2');
+
+    const audioTrack = myStreamState.getAudioTracks()[0];
+    console.log('Handle Mute 3');
+    if (audioTrack) {
+      console.log('Handle Mute 4');
+      audioTrack.enabled = !audioTrack.enabled;
+      setMuted(!audioTrack.enabled); // Обновите состояние mute
     }
   };
 
-  //Handling video off and one
   const handlePlayStopVideo = () => {
-    const enabled = myStream.getVideoTracks()[0].enabled;
+    if (!myStreamState) return; // Проверка, если поток доступен
 
-    if (enabled) {
-      myStream.getVideoTracks()[0].enabled = false;
-      setHideVideo(true);
-    } else {
-      myStream.getVideoTracks()[0].enabled = true;
-      setHideVideo(false);
+    const videoTrack = myStreamState.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      setHideVideo(!videoTrack.enabled); // Обновите состояние video
     }
   };
 
@@ -184,25 +200,12 @@ const Video = () => {
 
           <div className="options">
             <div className="options-left">
-              {!muted ? (
-                <div id="muteButton" className="options-button" onClick={handleMuteUnmute}>
-                  <i className="fa fa-microphone-slash"></i>
-                </div>
-              ) : (
-                <div id="muteButton" className="options-button">
-                  <i class="fas fa-microphone"></i>
-                </div>
-              )}
-
-              {!hideVideo ? (
-                <div id="stopVideo" className="options-button" onClick={handlePlayStopVideo}>
-                  <i className="fa fa-video-slash"></i>
-                </div>
-              ) : (
-                <div id="stopVideo" className="options-button" onClick={handlePlayStopVideo}>
-                  <i className="fa fa-video"></i>
-                </div>
-              )}
+              <div id="muteButton" className="options-button" onClick={handleMuteUnmute}>
+                <i className={`fa fa-${muted ? 'microphone' : 'microphone-slash'}`}></i>
+              </div>
+              <div id="stopVideo" className="options-button" onClick={handlePlayStopVideo}>
+                <i className={`fa fa-${hideVideo ? 'video' : 'video-slash'}`}></i>
+              </div>
             </div>
             <div className="options-right">
               <div className="leave-meet">
