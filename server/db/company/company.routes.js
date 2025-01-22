@@ -40,6 +40,7 @@ router.get('/:id', async (request, response) => {
     }
 
     response.status(200).json(company);
+
   } catch (error) {
     console.error('Error fetching company:', error);
     response.status(500).json({ message: 'Failed to retrieve company', error: error.message });
