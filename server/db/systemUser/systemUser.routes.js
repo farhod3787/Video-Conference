@@ -1,7 +1,7 @@
 import express from 'express';
 import systemUserModel from './systemUser.model.js';
 import auth from '../middleware/auth.js';
-import login from './systemUser.auth.js';
+import systemAuth from './systemUser.auth.js';
 
 const router = express.Router();
 
@@ -32,6 +32,6 @@ router.delete('/:id', async function (request, response) {
   }
 })
 
-router.post('/login', login);
+router.post('/login', systemAuth.login);
 
 export default router;

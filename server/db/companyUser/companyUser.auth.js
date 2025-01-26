@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
-import systemUserModel from './systemUser.model.js';
+import companyUserModel from './companyUser.model.js';
 import auth from '../middleware/auth.js';
 import config from '../../config/config.js';
 
 const login = async (request, response) => {
   const { login, password } = request.body;
 
-  const user = await systemUserModel.findOne({ login: login });
+  const user = await companyUserModel.findOne({ login: login });
 
   if (!user) return response.status(404).json({ message: 'User not found' });
 
