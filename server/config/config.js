@@ -2,7 +2,7 @@ const port = 8000;
 const url = 'http://localhost:8000';
 const database = 'mongodb://localhost:27017/video_conference';
 const JWT_SECRET = 'zoom-clone';
-const JWT_EXPIRATION = '1h';
+const JWT_EXPIRATION = '2h';
 
 export default {
   url,

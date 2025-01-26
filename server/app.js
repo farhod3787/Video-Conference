@@ -9,4 +9,6 @@ mongoose.connect(config.database).then( () => {
   console.log('Error in connected database')
 });
 
+mongoose.set('strictPopulate', false);
+
 export default app;
