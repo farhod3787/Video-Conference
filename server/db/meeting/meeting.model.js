@@ -20,6 +20,9 @@ const meetingsSchema = new mongoose.Schema({
   },
   note: {
     type: String
+  },
+  file_sha : {
+    type: String
   }
 });
 

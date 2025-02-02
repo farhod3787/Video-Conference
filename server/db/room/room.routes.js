@@ -103,7 +103,7 @@ router.post('close/:id', auth.authenticate, async (request, response) => {
   }
 });
 
-router.post('start/:id', auth.authenticate, async (request, response) => {
+router.post('start_meeting/:id', auth.authenticate, async (request, response) => {
   const { id } = request.params;
   try {
     const room = await roomModel.findById(id);
@@ -119,7 +119,7 @@ router.post('start/:id', auth.authenticate, async (request, response) => {
   }
 });
 
-router.post('finish/:meeting_id', auth.authenticate, async (request, response) => {
+router.post('finish_meeting/:meeting_id', auth.authenticate, async (request, response) => {
   const { meeting_id } = request.params;
 
   try {
