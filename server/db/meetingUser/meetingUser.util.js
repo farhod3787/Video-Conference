@@ -1,4 +1,4 @@
-import meetingUserModel from "./meetingUser.model";
+import meetingUserModel from "./meetingUser.model.js";
 
 const createNewMeetingUser = async (request, response) => {
 
