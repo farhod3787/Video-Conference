@@ -1,6 +1,7 @@
 import express from 'express';
 import roomModel from './room.model.js'
 import meetingUtil from '../meeting/meeting.util.js'
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
